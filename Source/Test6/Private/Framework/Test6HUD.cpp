@@ -23,7 +23,11 @@ void ATest6HUD::InitHUD()
 
 void ATest6HUD::BindStat(APawn* InPawn)
 {
-	HUDWidget->InitWidget(InPawn);
+	if (!HUDWidget)
+		InitHUD();
+
+	if (!HUDWidget) return;
+		HUDWidget->InitWidget(InPawn);
 }
 
 void ATest6HUD::BeginPlay()
@@ -31,5 +35,9 @@ void ATest6HUD::BeginPlay()
 	Super::BeginPlay();
 
 	InitHUD();
+	if (APlayerController* PC = GetOwningPlayerController())
+	{
+		BindStat(PC->GetPawn());
+	}
 
 }

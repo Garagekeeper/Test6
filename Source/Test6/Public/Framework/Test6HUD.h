@@ -15,9 +15,11 @@ class TEST6_API ATest6HUD : public AHUD
 	GENERATED_BODY()
 
 public:
+	// HUD위젯을 생성하고 뷰포트에 띄우는 함수
 	UFUNCTION(BlueprintCallable)
 	void InitHUD();
 	
+	// 실제 Player와 위젯을 바인딩하는 함수
 	UFUNCTION(BlueprintCallable)
 	void BindStat(APawn* InPawn);
 

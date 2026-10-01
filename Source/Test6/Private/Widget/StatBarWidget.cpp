@@ -46,12 +46,10 @@ void UStatBarWidget::UpdateMana(const FOnAttributeChangeData& InData)
 	if (bFound) MaxMana = TempMax;
 
 	UpdateMana(InData.NewValue, MaxMana);
-
 }
 
 void UStatBarWidget::UpdateMaxHealth(const FOnAttributeChangeData& InData)
 {
-
 	// 현재 체력은 뽑아서 사용
 	float CurrenHealth = .0f;
 	bool bFound = false;
@@ -63,19 +61,45 @@ void UStatBarWidget::UpdateMaxHealth(const FOnAttributeChangeData& InData)
 
 void UStatBarWidget::UpdateMaxMana(const FOnAttributeChangeData& InData)
 {
-
 	// 현재 마나는 뽑아서 사용
 	float CurrentMana = .0f;
 	bool bFound = false;
 	const float TempCurrent = ASC->GetGameplayAttributeValue(UPlayerAttributeSet::GetManaAttribute(), bFound);
 	if (bFound) CurrentMana = TempCurrent;
 
+	UpdateMana(CurrentMana, InData.NewValue);
+}
 
+void UStatBarWidget::NativeDestruct()
+{
+	UnbindASC();
+	Super::NativeDestruct();
+}
+
+void UStatBarWidget::UnbindASC()
+{
+	UAbilitySystemComponent* CurrASC = ASC.Get();
+	if (!CurrASC) return;
+
+	// 델리게이트 해제
+	CurrASC->GetGameplayAttributeValueChangeDelegate(UPlayerAttributeSet::GetHealthAttribute()).RemoveAll(this);
+	CurrASC->GetGameplayAttributeValueChangeDelegate(UPlayerAttributeSet::GetMaxHealthAttribute()).RemoveAll(this);
+	CurrASC->GetGameplayAttributeValueChangeDelegate(UPlayerAttributeSet::GetManaAttribute()).RemoveAll(this);
+	CurrASC->GetGameplayAttributeValueChangeDelegate(UPlayerAttributeSet::GetMaxManaAttribute()).RemoveAll(this);
+
+	// ASC nullptr로 밀어주기
+	ASC.Reset();
 }
 
 void UStatBarWidget::InitWidget(APawn* InPawn)
 {
 	if (!InPawn) return;
+
+	// 어떤 경로에서 이미 ASC가 설정 되었다면
+	if (ASC.IsValid())
+	{
+		UnbindASC();
+	}
 
 	IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(InPawn);
 	if (!ASI) return;

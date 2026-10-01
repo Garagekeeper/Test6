@@ -37,7 +37,11 @@ protected:
 	void UpdateMaxHealth(const FOnAttributeChangeData& InData);
 	void UpdateMaxMana(const FOnAttributeChangeData& InData);
 
+	virtual void NativeDestruct() override;
 
+
+private:
+	void UnbindASC();
 
 
 protected:
